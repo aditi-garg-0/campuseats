@@ -25,7 +25,6 @@ The bottom status bar of the Network panel reports the total request count, the 
 | Total requests | 318 |
 | Total transferred (page size) | 6.7 MB |
 | Total resource size (uncompressed) | 21.3 MB |
-| DOMContentLoaded time | `[still not visible in captured screenshots, hover directly over the "DOMContentLoaded" text in the status bar to reveal it in a tooltip]` |
 | Load time (Finish) | 8.5 min |
 
 **Observation:** The request count and finish time were not stable across repeated captures of the same page (285 requests at 21.73 s, then 298 requests at 1.4 min, then 295 requests at 53.44 s, then 318 requests at 8.5 min across four successive captures). This is expected for an advertising and analytics heavy page such as this one: scripts continue to fire tracking and bidding requests in the background well after the visible content has finished rendering, so there is no single moment at which loading truly stops. The figures above are taken from the most recent, most complete capture.
