@@ -4,6 +4,20 @@
 
 This repository is the working record of CampusEats, a campus scale food ordering system conceived as the semester long project for **CS 543: Web Services**, taught by Dr. Pramit Mazumdar, Department of CSE, IIIT Vadodara. It contains the foundation on which the code will be built: a demonstrated understanding of the HTTP protocol at the level of individual bytes on the wire, an inspection of how a real, production website actually behaves under network load, and a settled statement of what CampusEats is, expressed in terms precise enough to become an API contract.
 
+The repository has now been extended with **Assignment 2**, which takes the initial CampusEats brief and develops it into a service-oriented design. It defines the system capabilities, service boundaries, service contracts, the central `placeOrder()` operation, service-property validation, and the database schema.
+
+---
+
+## Group Information
+
+**Group No.: 7**
+
+| Role | Name | Student ID |
+|---|---|---|
+| Group Leader | Aditi Garg | 20251651008 |
+| Group Member | Neha Nupur | 20251651064 |
+| Group Member | Shivam Kumar Soni | 20251651084 |
+
 ---
 
 ## The Problem CampusEats Addresses
@@ -16,14 +30,72 @@ CampusEats separates these two steps. A student browses a menu and places an ord
 
 ## Repository Structure
 
-```
+The repository contains the deliverables from both assignments.
+
+```text
 campuseats/
-├── README.md              this document
-└── docs/
-    └── http-log.md            Assignment 1, Task 1: five HTTP requests, sent and read by hand
-    ├── network-analysis.md    Assignment 1, Task 2: a real page load, read through DevTools
-    ├── brief.md                Assignment 1, Task 4: a precise statement of what CampusEats is
-```
+├── README.md
+├── brief.md
+│
+├── docs/
+│   ├── http-log.md
+│   ├── network-analysis.md
+│   ├── screenshot-1.png
+│   ├── screenshot-2.png
+│   ├── screenshot-3.png
+│   ├── screenshot-4.png
+│   ├── screenshot-5.png
+│   ├── screenshot-6.png
+│   ├── screenshot-7.png
+│   └── screenshot-8.png
+│
+└── Assignment 2/
+    ├── Task 1, 3, 4, 6/
+    │   └── design.pdf
+    │
+    ├── Task 2/
+    │   ├── services.drawio
+    │   └── services.png
+    │
+    └── Task 5/
+        ├── schema.drawio
+        ├── schema.png
+        └── schema.sql
+````
+
+---
+
+## Assignment 1: HTTP by Hand and Project Foundation
+
+Assignment 1 established the technical foundation for CampusEats. It focused on understanding HTTP communication before implementing the actual application.
+
+The repository contains the following work:
+
+* `http-log.md` — HTTP requests and responses captured using `curl`
+* `network-analysis.md` — analysis of a real website's network activity using browser DevTools
+* `brief.md` — the initial CampusEats system brief
+* Network screenshots supporting the analysis
+
+---
+
+## Assignment 2: Service Design and Database
+
+Assignment 2 takes the CampusEats idea defined in the first assignment and turns it into a structured service-oriented design.
+
+It defines the **16 capabilities** of the system, including identity, catalogue management, order management, payment, feedback, administration, and notifications.
+
+The design is divided into six services:
+
+1. **Identity & Access Service**
+2. **Catalogue Service**
+3. **Order Service**
+4. **Payment Service**
+5. **Feedback Service**
+6. **Notification & Admin Reporting Service**
+
+The two main services are the **Catalogue Service** and **Order Service**, while the remaining four provide supporting functionality. The design contains **44 operations across the six services**.
+
+Assignment 2 also specifies the central `placeOrder()` operation, including its input, output, validation rules, error cases, internal processing, and cross-service calls. It also defines the database schema and validates the service properties of the designed services.
 
 ---
 
@@ -43,6 +115,8 @@ This is the purpose of `http-log.md`. Before CampusEats has a single route of it
 
 `brief.md` contains the full statement, but its structure is worth previewing here, since it is the structure that the eventual API will inherit directly. CampusEats is described in terms of its nouns, the persistent things the system must store state about: users, outlets, menu items, orders, order items, payments, reviews, and notifications. It is described equally in terms of its verbs, the actions a client is permitted to take against those nouns: browsing a menu, placing an order, updating an order's status as it moves from placed toward collected, marking a menu item as sold out, paying for an order, and leaving a review once it is complete. This is not incidental phrasing. A noun becomes a resource, addressed by a URL. A verb becomes an HTTP method applied to that resource, together with a status code that reports what happened. The entire reason this repository begins with raw HTTP rather than a framework is so that, when this mapping is finally implemented, every status code chosen for CampusEats will have been chosen with the same deliberateness observed in `http-log.md`, rather than accepted as whatever a framework happened to default to.
 
+Assignment 2 extends this foundation by mapping these capabilities into explicit services and contracts. Each service owns its own persistent data and communicates with other services through defined operations rather than directly accessing another service's database. The central `placeOrder()` operation connects identity validation, catalogue validation, order creation, payment, and notification while keeping these responsibilities separated between services.
+
 ---
 
 ## Commit History
@@ -51,7 +125,7 @@ This is the purpose of `http-log.md`. Before CampusEats has a single route of it
 git log --oneline
 ```
 
-The commits in this repository were made incrementally, as each deliverable was completed, rather than as a single combined submission at the end. The sequence visible in the log, scaffold, then the HTTP log, then the brief, then the network analysis, reflects the actual order in which the work was carried out, and is intended to stand as a readable account of that process rather than a formality.
+The commits in this repository were made incrementally, as each deliverable was completed, rather than as a single combined submission at the end. The sequence visible in the log, scaffold, then the HTTP log, then the brief, then the network analysis, followed by the Assignment 2 design and schema work, reflects the progression of the project and is intended to stand as a readable account of that process rather than a formality.
 
 ---
 
@@ -68,3 +142,42 @@ curl -I https://jsonplaceholder.typicode.com/users/1
 ```
 
 ---
+
+## Current Project Status
+
+### Completed
+
+* Assignment 1 — HTTP and project foundation
+* HTTP request/response analysis
+* Browser network analysis
+* CampusEats system brief
+* Assignment 2 capability design
+* Service architecture and boundaries
+* Service contracts
+* `placeOrder()` specification
+* Service property validation
+* Database schema and diagrams
+
+### Next Phase
+
+The next stage of CampusEats is the implementation of the designed services and APIs, followed by database integration, service integration, testing, and development of the complete application.
+
+---
+
+## Project Team
+
+**Group 7**
+
+* **Aditi Garg** — Group Leader — `20251651008`
+* **Neha Nupur** — Group Member — `20251651064`
+* **Shivam Kumar Soni** — Group Member — `20251651084`
+
+---
+
+## Project Direction
+
+The repository currently contains the analysis, requirements, service design, contracts, diagrams, and database foundation of CampusEats. The work completed so far establishes the architecture that will be used for the implementation phase of the project.
+
+CampusEats is intentionally kept focused on the campus food-ordering problem: students browse a campus outlet menu, place an order, track it, pay for it, and review it, while outlet staff manage availability and order status and administrators manage the platform.
+
+```
