@@ -164,16 +164,6 @@ The next stage of CampusEats is the implementation of the designed services and 
 
 ---
 
-## Project Team
-
-**Group 7**
-
-* **Aditi Garg** — Group Leader — `20251651008`
-* **Neha Nupur** — Group Member — `20251651064`
-* **Shivam Kumar Soni** — Group Member — `20251651084`
-
----
-
 ## Project Direction
 
 The repository currently contains the analysis, requirements, service design, contracts, diagrams, and database foundation of CampusEats. The work completed so far establishes the architecture that will be used for the implementation phase of the project.
