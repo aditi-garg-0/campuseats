@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions name="AasaanPayPayments"
+             targetNamespace="urn:aasaanpay:payments"
+             xmlns:tns="urn:aasaanpay:payments"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+             xmlns="http://schemas.xmlsoap.org/wsdl/">
+
+  <types>
+    <xsd:schema targetNamespace="urn:aasaanpay:payments"
+                xmlns:tns="urn:aasaanpay:payments"
+                elementFormDefault="qualified">
+
+      <xsd:element name="chargeRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="cardToken" type="xsd:string"/>
+            <xsd:element name="amount" type="xsd:decimal"/>
+            <xsd:element name="currency" type="xsd:string"/>
+            <xsd:element name="orderId" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="chargeResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="transactionId" type="xsd:string"/>
+            <xsd:element name="status" type="xsd:string"/>
+            <xsd:element name="capturedAmount" type="xsd:decimal"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="refundRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="transactionId" type="xsd:string"/>
+            <xsd:element name="amount" type="xsd:decimal"/>
+            <xsd:element name="reason" type="xsd:string" minOccurs="0"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="refundResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="refundId" type="xsd:string"/>
+            <xsd:element name="status" type="xsd:string"/>
+            <xsd:element name="refundedAmount" type="xsd:decimal"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="error">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="code" type="xsd:string"/>
+            <xsd:element name="description" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+    </xsd:schema>
+  </types>
+
+  <message name="chargeRequestMessage">
+    <part name="body" element="tns:chargeRequest"/>
+  </message>
+  <message name="chargeResponseMessage">
+    <part name="body" element="tns:chargeResult"/>
+  </message>
+  <message name="chargeFaultMessage">
+    <part name="detail" element="tns:error"/>
+  </message>
+
+  <message name="refundRequestMessage">
+    <part name="body" element="tns:refundRequest"/>
+  </message>
+  <message name="refundResponseMessage">
+    <part name="body" element="tns:refundResult"/>
+  </message>
+  <message name="refundFaultMessage">
+    <part name="detail" element="tns:error"/>
+  </message>
+
+  <portType name="AasaanPayPayments">
+
+    <operation name="charge">
+      <input message="tns:chargeRequestMessage"/>
+      <output message="tns:chargeResponseMessage"/>
+      <fault name="chargeFault" message="tns:chargeFaultMessage"/>
+    </operation>
+
+    <operation name="refund">
+      <input message="tns:refundRequestMessage"/>
+      <output message="tns:refundResponseMessage"/>
+      <fault name="refundFault" message="tns:refundFaultMessage"/>
+    </operation>
+
+  </portType>
+
+  <binding name="AasaanPayPaymentsSOAP" type="tns:AasaanPayPayments">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+
+    <operation name="charge">
+      <soap:operation soapAction="urn:aasaanpay:payments/charge"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="chargeFault">
+        <soap:fault name="chargeFault" use="literal"/>
+      </fault>
+    </operation>
+
+    <operation name="refund">
+      <soap:operation soapAction="urn:aasaanpay:payments/refund"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="refundFault">
+        <soap:fault name="refundFault" use="literal"/>
+      </fault>
+    </operation>
+
+  </binding>
+
+  <service name="AasaanPayPaymentsService">
+    <port name="AasaanPayPaymentsSOAP" binding="tns:AasaanPayPaymentsSOAP">
+      <soap:address location="https://gateway.aasaanpay.io/v2/payments"/>
+    </port>
+  </service>
+
+</definitions>
