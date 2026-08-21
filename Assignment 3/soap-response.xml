@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                xmlns:pay="urn:aasaanpay:payments">
+
+  <soap:Body>
+    <pay:chargeResult>
+      <transactionId>txn_558231</transactionId>
+      <status>captured</status>
+      <capturedAmount>450.00</capturedAmount>
+    </pay:chargeResult>
+  </soap:Body>
+
+</soap:Envelope>
