@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<soap:Envelope
+    xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+    xmlns:uni="urn:unipay">
+
+    <soap:Body>
+
+        <uni:chargeResult>
+
+            <uni:transactionId>
+                tx_5521
+            </uni:transactionId>
+
+            <uni:status>
+                captured
+            </uni:status>
+
+        </uni:chargeResult>
+
+    </soap:Body>
+
+</soap:Envelope>

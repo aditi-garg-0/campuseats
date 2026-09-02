@@ -1,0 +1,2 @@
+PS C:\Users\shiva\OneDrive\Documents\campusEats\campuseats\Assignment_4Orders\Part B> npx swagger-cli validate openapi.yaml
+openapi.yaml is valid
