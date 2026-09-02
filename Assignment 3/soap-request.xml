@@ -1,27 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                xmlns:pay="urn:aasaanpay:payments"
+                xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
+                xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
 
-<soap:Envelope
-    xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-    xmlns:uni="urn:unipay">
+  <soap:Header>
+    <wsse:Security soap:mustUnderstand="1">
+      <wsse:UsernameToken wsu:Id="CampusEatsMerchantToken">
+        <wsse:Username>campuseats_merchant</wsse:Username>
+        <wsse:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest">
+          Qk3f9pXvL2mZ0hRWs1Tn8yA0eIk=
+        </wsse:Password>
+        <wsse:Nonce EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary">
+          e3JzWmt0aG5wcXY3
+        </wsse:Nonce>
+        <wsu:Created>2026-08-21T09:14:02Z</wsu:Created>
+      </wsse:UsernameToken>
+    </wsse:Security>
+  </soap:Header>
 
-    <soap:Header>
-
-        <uni:auth token="CE-MERCHANT-KEY"/>
-
-    </soap:Header>
-
-    <soap:Body>
-
-        <uni:charge>
-
-            <uni:cardToken>tok_9f2c</uni:cardToken>
-
-            <uni:amount>300</uni:amount>
-
-            <uni:currency>INR</uni:currency>
-
-        </uni:charge>
-
-    </soap:Body>
+  <soap:Body>
+    <pay:chargeRequest>
+      <cardToken>tok_9f21c4</cardToken>
+      <amount>450.00</amount>
+      <currency>INR</currency>
+      <orderId>ORD_88231</orderId>
+    </pay:chargeRequest>
+  </soap:Body>
 
 </soap:Envelope>

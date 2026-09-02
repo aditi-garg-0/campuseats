@@ -1,29 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                xmlns:pb="urn:aasaanpay:payments">
 
-<soap:Envelope
-    xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-    xmlns:uni="urn:unipay">
-
-    <soap:Body>
-
-        <soap:Fault>
-
-            <faultcode>
-                soap:Client
-            </faultcode>
-
-            <faultstring>
-                Card declined
-            </faultstring>
-
-            <detail>
-
-                <uni:error code="card_declined"/>
-
-            </detail>
-
-        </soap:Fault>
-
-    </soap:Body>
+  <soap:Body>
+    <soap:Fault>
+      <faultcode>soap:Client</faultcode>
+      <faultstring>Charge declined by issuing bank</faultstring>
+      <detail>
+        <pb:error>
+          <code>TXN_DECLINED</code>
+          <description>The issuing bank declined this charge and no funds were captured.</description>
+        </pb:error>
+      </detail>
+    </soap:Fault>
+  </soap:Body>
 
 </soap:Envelope>

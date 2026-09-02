@@ -1,149 +1,140 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<definitions name="AasaanPayPayments"
+             targetNamespace="urn:aasaanpay:payments"
+             xmlns:tns="urn:aasaanpay:payments"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+             xmlns="http://schemas.xmlsoap.org/wsdl/">
 
-<definitions
-    xmlns="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    xmlns:pay="urn:unipay"
-    targetNamespace="urn:unipay"
-    name="PaymentsService">
+  <types>
+    <xsd:schema targetNamespace="urn:aasaanpay:payments"
+                xmlns:tns="urn:aasaanpay:payments"
+                elementFormDefault="qualified">
 
-    <!-- types -->
+      <xsd:element name="chargeRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="cardToken" type="xsd:string"/>
+            <xsd:element name="amount" type="xsd:decimal"/>
+            <xsd:element name="currency" type="xsd:string"/>
+            <xsd:element name="orderId" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
 
-    <types>
+      <xsd:element name="chargeResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="transactionId" type="xsd:string"/>
+            <xsd:element name="status" type="xsd:string"/>
+            <xsd:element name="capturedAmount" type="xsd:decimal"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
 
-        <xsd:schema targetNamespace="urn:unipay">
+      <xsd:element name="refundRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="transactionId" type="xsd:string"/>
+            <xsd:element name="amount" type="xsd:decimal"/>
+            <xsd:element name="reason" type="xsd:string" minOccurs="0"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
 
-            <xsd:element name="charge">
+      <xsd:element name="refundResult">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="refundId" type="xsd:string"/>
+            <xsd:element name="status" type="xsd:string"/>
+            <xsd:element name="refundedAmount" type="xsd:decimal"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
 
-                <xsd:complexType>
+      <xsd:element name="error">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="code" type="xsd:string"/>
+            <xsd:element name="description" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
 
-                    <xsd:sequence>
+    </xsd:schema>
+  </types>
 
-                        <xsd:element
-                            name="cardToken"
-                            type="xsd:string"/>
+  <message name="chargeRequestMessage">
+    <part name="body" element="tns:chargeRequest"/>
+  </message>
+  <message name="chargeResponseMessage">
+    <part name="body" element="tns:chargeResult"/>
+  </message>
+  <message name="chargeFaultMessage">
+    <part name="detail" element="tns:error"/>
+  </message>
 
-                        <xsd:element
-                            name="amount"
-                            type="xsd:decimal"/>
+  <message name="refundRequestMessage">
+    <part name="body" element="tns:refundRequest"/>
+  </message>
+  <message name="refundResponseMessage">
+    <part name="body" element="tns:refundResult"/>
+  </message>
+  <message name="refundFaultMessage">
+    <part name="detail" element="tns:error"/>
+  </message>
 
-                        <xsd:element
-                            name="currency"
-                            type="xsd:string"/>
+  <portType name="AasaanPayPayments">
 
-                    </xsd:sequence>
+    <operation name="charge">
+      <input message="tns:chargeRequestMessage"/>
+      <output message="tns:chargeResponseMessage"/>
+      <fault name="chargeFault" message="tns:chargeFaultMessage"/>
+    </operation>
 
-                </xsd:complexType>
+    <operation name="refund">
+      <input message="tns:refundRequestMessage"/>
+      <output message="tns:refundResponseMessage"/>
+      <fault name="refundFault" message="tns:refundFaultMessage"/>
+    </operation>
 
-            </xsd:element>
+  </portType>
 
+  <binding name="AasaanPayPaymentsSOAP" type="tns:AasaanPayPayments">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
 
-            <xsd:element name="chargeResult">
+    <operation name="charge">
+      <soap:operation soapAction="urn:aasaanpay:payments/charge"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="chargeFault">
+        <soap:fault name="chargeFault" use="literal"/>
+      </fault>
+    </operation>
 
-                <xsd:complexType>
+    <operation name="refund">
+      <soap:operation soapAction="urn:aasaanpay:payments/refund"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="refundFault">
+        <soap:fault name="refundFault" use="literal"/>
+      </fault>
+    </operation>
 
-                    <xsd:sequence>
+  </binding>
 
-                        <xsd:element
-                            name="transactionId"
-                            type="xsd:string"/>
-
-                        <xsd:element
-                            name="status"
-                            type="xsd:string"/>
-
-                    </xsd:sequence>
-
-                </xsd:complexType>
-
-            </xsd:element>
-
-        </xsd:schema>
-
-    </types>
-
-
-    <!-- message -->
-
-    <message name="chargeRequest">
-
-        <part
-            name="body"
-            element="pay:charge"/>
-
-    </message>
-
-
-    <message name="chargeResponse">
-
-        <part
-            name="body"
-            element="pay:chargeResult"/>
-
-    </message>
-
-
-    <!-- port type -->
-
-    <portType name="Payments">
-
-        <operation name="charge">
-
-            <input message="pay:chargeRequest"/>
-
-            <output message="pay:chargeResponse"/>
-
-        </operation>
-
-    </portType>
-
-
-    <!-- binding -->
-
-    <binding
-        name="PaymentsSOAP"
-        type="pay:Payments">
-
-        <soap:binding
-            transport="http://schemas.xmlsoap.org/soap/http"
-            style="document"/>
-
-        <operation name="charge">
-
-            <soap:operation
-                soapAction="urn:unipay:charge"/>
-
-            <input>
-
-                <soap:body use="literal"/>
-
-            </input>
-
-            <output>
-
-                <soap:body use="literal"/>
-
-            </output>
-
-        </operation>
-
-    </binding>
-
-
-    <!-- service and port -->
-
-    <service name="PaymentsService">
-
-        <port
-            name="PaymentsSOAP"
-            binding="pay:PaymentsSOAP">
-
-            <soap:address
-                location="https://api.unipay.example/pay"/>
-
-        </port>
-
-    </service>
+  <service name="AasaanPayPaymentsService">
+    <port name="AasaanPayPaymentsSOAP" binding="tns:AasaanPayPaymentsSOAP">
+      <soap:address location="https://gateway.aasaanpay.io/v2/payments"/>
+    </port>
+  </service>
 
 </definitions>
