@@ -1,0 +1,317 @@
+openapi: 3.0.3
+info:
+  title: CampusEats Catalogue Service
+  description: >
+    Owns Outlet and Menu Item data for CampusEats (Assignment 2 boundary:
+    Catalogue Service, owned by Aditi Garg). Rebuilt as REST for Assignment 4;
+    the SOAP-style operations this replaces (registerOutlet, getOutletMenu,
+    addMenuItem, setItemAvailability) are documented in Assignment 3's
+    integration.pdf and this file's NOTES.md companion.
+  version: "1.0.0"
+servers:
+  - url: http://localhost:5000
+    description: Local development server
+
+paths:
+  /outlets:
+    post:
+      operationId: createOutlet
+      summary: Register a new outlet (registerOutlet)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OutletCreate'
+      responses:
+        '201':
+          description: Outlet created
+          headers:
+            Location:
+              description: URL of the newly created outlet
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Outlet'
+        '400':
+          description: Malformed request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Well-formed body the domain refuses (e.g. blank name)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+
+  /outlets/{outletId}:
+    get:
+      operationId: getOutlet
+      summary: Read a single outlet
+      parameters:
+        - name: outletId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Outlet found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Outlet'
+        '404':
+          description: Outlet does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+
+  /outlets/{outletId}/menu-items:
+    post:
+      operationId: addMenuItem
+      summary: Add a menu item to an outlet (addMenuItem)
+      description: >
+        Safely retryable. Send an Idempotency-Key header; a repeated request
+        with the same key returns the original result instead of creating a
+        second item.
+      parameters:
+        - name: outletId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Client-generated key that makes a retried create safe.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MenuItemCreate'
+      responses:
+        '201':
+          description: Menu item created (or original result, if the Idempotency-Key was already seen)
+          headers:
+            Location:
+              description: URL of the newly created menu item
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuItem'
+        '400':
+          description: Malformed request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '404':
+          description: Outlet does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Well-formed body the domain refuses (e.g. negative price)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+
+    get:
+      operationId: getOutletMenu
+      summary: List menu items for an outlet, optionally filtered by availability (getOutletMenu)
+      parameters:
+        - name: outletId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: available
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: Filter to only available (true) or only unavailable (false) items.
+      responses:
+        '200':
+          description: Matching menu items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MenuItem'
+        '404':
+          description: Outlet does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+
+  /menu-items/{menuItemId}/availability:
+    patch:
+      operationId: setItemAvailability
+      summary: >
+        Change a menu item's availability (setItemAvailability). Modelled as
+        its own sub-resource rather than a plain PATCH on the item itself —
+        see NOTES.md Part A5.
+      description: >
+        Best-effort, non-blocking cross-service check: before returning, this
+        endpoint asks the Order Service whether the outlet has any currently
+        placed orders, purely to attach an advisory warning. If the Order
+        Service is unreachable, the availability change still succeeds and
+        the warning is simply marked unknown — see NOTES.md Part D3.
+      parameters:
+        - name: menuItemId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AvailabilityUpdate'
+      responses:
+        '200':
+          description: Availability updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuItemWithWarning'
+        '404':
+          description: Menu item does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '409':
+          description: Menu item is already in the requested availability state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422':
+          description: Malformed or invalid body (e.g. available is not a boolean)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+
+components:
+  schemas:
+    OutletCreate:
+      type: object
+      required: [name, address]
+      properties:
+        name:
+          type: string
+        address:
+          type: string
+        phone:
+          type: string
+
+    Outlet:
+      type: object
+      properties:
+        outlet_id:
+          type: integer
+        name:
+          type: string
+        address:
+          type: string
+        phone:
+          type: string
+          nullable: true
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    MenuItemCreate:
+      type: object
+      required: [name, price]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: decimal
+
+    MenuItem:
+      type: object
+      properties:
+        menu_item_id:
+          type: integer
+        outlet_id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        price:
+          type: number
+        is_available:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    MenuItemWithWarning:
+      allOf:
+        - $ref: '#/components/schemas/MenuItem'
+        - type: object
+          properties:
+            active_order_warning:
+              type: object
+              nullable: true
+              properties:
+                checked:
+                  type: boolean
+                active_order_count:
+                  type: integer
+                  nullable: true
+                note:
+                  type: string
+
+    AvailabilityUpdate:
+      type: object
+      required: [available]
+      properties:
+        available:
+          type: boolean
+        reason:
+          type: string
+
+    Problem:
+      type: object
+      required: [type, title, status, detail]
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        code:
+          type: string
+          description: Machine-readable error slug, e.g. item_not_found.

@@ -1,0 +1,174 @@
+### 1. Create an outlet
+HTTP/1.1 201 CREATED
+Server: Werkzeug/3.1.7 Python/3.12.3
+Date: Wed, 02 Sep 2026 09:10:43 GMT
+Content-Type: application/json
+Content-Length: 178
+Location: /outlets/1
+Connection: close
+
+{
+  "address": "Block C, Ground Floor",
+  "created_at": "2026-09-02T09:10:43.554833+00:00",
+  "is_active": true,
+  "name": "Tandoori Corner",
+  "outlet_id": 1,
+  "phone": null
+}
+
+
+### 2. Create a menu item under that outlet (successful create, with Location header)
+HTTP/1.1 201 CREATED
+Server: Werkzeug/3.1.7 Python/3.12.3
+Date: Wed, 02 Sep 2026 09:10:43 GMT
+Content-Type: application/json
+Content-Length: 183
+Location: /menu-items/1
+Connection: close
+
+{
+  "created_at": "2026-09-02T09:10:43.563738+00:00",
+  "description": null,
+  "is_available": true,
+  "menu_item_id": 1,
+  "name": "Paneer Roll",
+  "outlet_id": 1,
+  "price": 90.0
+}
+
+
+### 3. Repeat the SAME request with the SAME Idempotency-Key (different body on purpose) -> returns the ORIGINAL result, no duplicate created
+HTTP/1.1 201 CREATED
+Server: Werkzeug/3.1.7 Python/3.12.3
+Date: Wed, 02 Sep 2026 09:10:43 GMT
+Content-Type: application/json
+Content-Length: 183
+Location: /menu-items/1
+Connection: close
+
+{
+  "created_at": "2026-09-02T09:10:43.563738+00:00",
+  "description": null,
+  "is_available": true,
+  "menu_item_id": 1,
+  "name": "Paneer Roll",
+  "outlet_id": 1,
+  "price": 90.0
+}
+
+
+### 4. Malformed body rejected (negative price -> 422, single error shape)
+HTTP/1.1 422 UNPROCESSABLE ENTITY
+Server: Werkzeug/3.1.7 Python/3.12.3
+Date: Wed, 02 Sep 2026 09:10:43 GMT
+Content-Type: application/json
+Content-Length: 202
+Connection: close
+
+{
+  "code": "validation_failed",
+  "detail": "'price' must be a positive number.",
+  "status": 422,
+  "title": "Unprocessable request",
+  "type": "https://campuseats.example/errors/validation_failed"
+}
+
+
+### 5. Missing resource (404)
+HTTP/1.1 404 NOT FOUND
+Server: Werkzeug/3.1.7 Python/3.12.3
+Date: Wed, 02 Sep 2026 09:10:43 GMT
+Content-Type: application/json
+Content-Length: 162
+Connection: close
+
+{
+  "code": "not_found",
+  "detail": "No outlet with id 999.",
+  "status": 404,
+  "title": "Not found",
+  "type": "https://campuseats.example/errors/not_found"
+}
+
+
+### 6. State conflict (409) -- item is already available, setting available:true again
+HTTP/1.1 409 CONFLICT
+Server: Werkzeug/3.1.7 Python/3.12.3
+Date: Wed, 02 Sep 2026 09:10:43 GMT
+Content-Type: application/json
+Content-Length: 170
+Connection: close
+
+{
+  "code": "conflict",
+  "detail": "Menu item 1 is already available.",
+  "status": 409,
+  "title": "Conflict",
+  "type": "https://campuseats.example/errors/conflict"
+}
+
+
+### 7. Successful state change that ALSO makes the hardened outbound call to Order Service (available:false) -- Order Service (stub) reports 2 currently-placed orders for outlet 1
+HTTP/1.1 200 OK
+Server: Werkzeug/3.1.7 Python/3.12.3
+Date: Wed, 02 Sep 2026 09:10:43 GMT
+Content-Type: application/json
+Content-Length: 331
+Connection: close
+
+{
+  "active_order_warning": {
+    "active_order_count": 2,
+    "checked": true,
+    "note": "2 placed order(s) currently open for this outlet."
+  },
+  "created_at": "2026-09-02T09:10:43.563738+00:00",
+  "description": null,
+  "is_available": false,
+  "menu_item_id": 1,
+  "name": "Paneer Roll",
+  "outlet_id": 1,
+  "price": 90.0
+}
+
+
+### 8. Filtered list using a query string (only available items for outlet 1, after item 1 was just marked unavailable above)
+HTTP/1.1 201 CREATED
+Server: Werkzeug/3.1.7 Python/3.12.3
+Date: Wed, 02 Sep 2026 09:10:43 GMT
+Content-Type: application/json
+Content-Length: 184
+Location: /menu-items/2
+Connection: close
+
+{
+  "created_at": "2026-09-02T09:10:43.616728+00:00",
+  "description": null,
+  "is_available": true,
+  "menu_item_id": 2,
+  "name": "Veg Sandwich",
+  "outlet_id": 1,
+  "price": 50.0
+}
+
+
+HTTP/1.1 200 OK
+Server: Werkzeug/3.1.7 Python/3.12.3
+Date: Wed, 02 Sep 2026 09:10:43 GMT
+Content-Type: application/json
+Content-Length: 206
+Connection: close
+
+[
+  {
+    "created_at": "2026-09-02T09:10:43.616728+00:00",
+    "description": null,
+    "is_available": true,
+    "menu_item_id": 2,
+    "name": "Veg Sandwich",
+    "outlet_id": 1,
+    "price": 50.0
+  }
+]
+
+
