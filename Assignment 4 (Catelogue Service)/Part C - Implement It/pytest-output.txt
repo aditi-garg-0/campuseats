@@ -1,0 +1,15 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.1.1, pluggy-1.6.0 -- /usr/bin/python3
+cachedir: .pytest_cache
+rootdir: /home/claude/campuseats/Assignment 4
+collecting ... collected 7 items
+
+tests/test_catalogue.py::test_create_succeeds_with_right_code_and_location_header PASSED [ 14%]
+tests/test_catalogue.py::test_idempotent_repeat_returns_original_result PASSED [ 28%]
+tests/test_catalogue.py::test_malformed_body_returns_422 PASSED          [ 42%]
+tests/test_catalogue.py::test_unknown_id_returns_404 PASSED              [ 57%]
+tests/test_catalogue.py::test_state_conflict_returns_409 PASSED          [ 71%]
+tests/test_catalogue.py::test_filtered_list_by_query_string PASSED       [ 85%]
+tests/test_catalogue.py::test_availability_change_degrades_when_order_service_unreachable PASSED [100%]
+
+============================== 7 passed in 0.21s ===============================
